@@ -26,14 +26,15 @@ def blit(im1, im2, pos=[0, 0], mask=None, ismask=False):
     y2 = min(h1, h2 - yp)
     xp1 = max(0, xp)
     yp1 = max(0, yp)
-
     if (xp1 >= xp2) or (yp1 >= yp2):
         return im2
 
     blitted = im1[y1:y2, x1:x2]
-
-    new_im2 = +im2
-
+    if  yp1== y1 and yp2 == y2 and xp1==x1 and xp2 == x2 and mask is None:
+       return blitted.astype('uint8') if (not ismask) else blitted
+    else:
+       new_im2=np.copy(im2)
+    
     if mask is not None:
         mask = mask[y1:y2, x1:x2]
         if len(im1.shape) == 3:
