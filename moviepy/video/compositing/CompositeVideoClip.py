@@ -46,7 +46,7 @@ class CompositeVideoClip(VideoClip):
     """
 
     def __init__(self, clips, size=None, bg_color=None, use_bgclip=False,
-                 ismask=False, use_mask_blit=True):
+                 ismask=False, use_mask_blit=True, blend_modes=None):
 
         if size is None:
             size = clips[0].size
@@ -106,10 +106,14 @@ class CompositeVideoClip(VideoClip):
                 another. """
 
             f = self.bg.get_frame(t)
-            for c in self.playing_clips(t):
+            for ind, c in self.playing_clips(t):
                     if not use_mask_blit:
                         c.mask = None
-                    f = c.blit_on(f, t)
+                    if blend_modes:
+                        blend_mode = blend_modes[ind]
+                    else:
+                        blend_mode = None
+                    f = c.blit_on(f, t, blend_mode) 
             return f
 
         self.make_frame = make_frame
@@ -117,7 +121,7 @@ class CompositeVideoClip(VideoClip):
     def playing_clips(self, t=0):
         """ Returns a list of the clips in the composite clips that are
             actually playing at the given time `t`. """
-        return [c for c in self.clips if c.is_playing(t)]
+        return [(ind, c) for ind, c in enumerate(self.clips) if c.is_playing(t)]
 
 
 

@@ -517,7 +517,7 @@ class VideoClip(Clip):
     # C O M P O S I T I N G
 
 
-    def blit_on(self, picture, t):
+    def blit_on(self, picture, t, blend_mode=None):
         """
         Returns the result of the blit of the clip's frame at time `t`
         on the given `picture`, the position of the clip being given
@@ -568,7 +568,7 @@ class VideoClip(Clip):
 
         pos = map(int, pos)
 
-        return blit(img, picture, pos, mask=mask, ismask=self.ismask)
+        return blit(img, picture, pos, mask=mask, ismask=self.ismask, blend_mode=blend_mode)
 
 
     def add_mask(self):

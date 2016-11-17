@@ -4,8 +4,9 @@ methods that are difficult to do with the existing Python libraries.
 """
 
 import numpy as np
+from blend_modes import blend_modes
 
-def blit(im1, im2, pos=[0, 0], mask=None, ismask=False):
+def blit(im1, im2, pos=[0, 0], mask=None, ismask=False, blend_mode=None):
     """ Blit an image over another.
     
     Blits ``im1`` on ``im2`` as position ``pos=(x,y)``, using the
@@ -32,15 +33,30 @@ def blit(im1, im2, pos=[0, 0], mask=None, ismask=False):
 
     blitted = im1[y1:y2, x1:x2]
 
+    blend_map = {
+      'multiply': blend_modes.multiply,
+      'hard_light': blend_modes.hard_light,
+      'dodge': blend_modes.dodge
+    }
+
     new_im2 = +im2
 
     if mask is not None:
         mask = mask[y1:y2, x1:x2]
-        if len(im1.shape) == 3:
-            mask = np.dstack(3 * [mask])
         blit_region = new_im2[yp1:yp2, xp1:xp2]
-        new_im2[yp1:yp2, xp1:xp2] = (
-            1.0 * mask * blitted + (1.0 - mask) * blit_region)
+        if len(im1.shape) == 3:
+            blend_func = blend_map.get(blend_mode)
+            if blend_func:
+              shape = list(blitted.shape[:2])
+              shape.append(1)
+
+              blit_region = np.concatenate((blit_region, 255*np.ones(shape)), axis=2)
+              blitted = np.concatenate((blitted, 255*mask.reshape(shape)), axis=2)
+              new_im2[yp1:yp2, xp1:xp2] = blend_func(blit_region.astype(float), blitted.astype(float), 1).astype('uint8')[:,:,:3]
+            else:
+              mask = np.dstack(3 * [mask])
+              new_im2[yp1:yp2, xp1:xp2] = (
+              1.0 * mask * blitted + (1.0 - mask) * blit_region)
     else:
         new_im2[yp1:yp2, xp1:xp2] = blitted
 
