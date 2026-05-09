@@ -40,4 +40,4 @@ setup(name='livingbio-moviepy',
     packages= find_packages(exclude='docs'),
     setup_requires=['cython==0.25.2'],
     ext_modules=[ext],
-    install_requires= ['numpy', 'decorator', 'imageio<2', 'tqdm==4.8.4'])
+    install_requires= ['numpy', 'decorator', 'imageio<2', 'tqdm==4.66.3'])
